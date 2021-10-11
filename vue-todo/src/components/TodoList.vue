@@ -1,11 +1,11 @@
 <template>
   <div>
     <ul>
-      <li v-for="(item, index) in todoItems" :key="item.item" class="shadow">
+      <li v-for="(item, index) in propsdata" :key="item.item" class="shadow">
         <i
           class="far fa-check-square checkBtn"
-          v-bind:class="{ checkBtnCompleted: item.completed }"
-          v-on:click="toggleComplete(item)"
+          v-bind:class="{ checkBtnCompleted: item.completed, testClass }"
+          v-on:click="toggleComplete(item, index)"
         ></i>
         <span v-bind:class="{ textCompleted: item.completed }">
           {{ item.item }}
@@ -20,32 +20,19 @@
 
 <script>
 export default {
+  props: ["propsdata"],
   data: function() {
     return {
       todoItems: [],
+      testClass: true,
     };
-  },
-  created: function() {
-    if (localStorage.length > 0) {
-      for (var i = 0; i < localStorage.length; i++) {
-        if (localStorage.key(i) !== "loglevel:webpack-dev-server") {
-          this.todoItems.push(
-            JSON.parse(localStorage.getItem(localStorage.key(i)))
-          );
-        }
-      }
-    }
-    localStorage.getItem(this.todoItems);
   },
   methods: {
     removeTodo: function(todoItem, index) {
-      localStorage.removeItem(todoItem);
-      this.todoItems.splice(index, 1);
+      this.$emit("removeItem", todoItem, index);
     },
-    toggleComplete: function(item) {
-      item.completed = !item.completed;
-      localStorage.removeItem(item.item);
-      localStorage.setItem(item.item, JSON.stringify(item));
+    toggleComplete: function(item, index) {
+      this.$emit("completeItem", item, index);
     },
   },
 };
